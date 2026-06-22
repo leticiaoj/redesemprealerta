@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rede Sempre Alerta - Solidariedade Escoteira</title>
+    <style>
+        :root {
+            --verde-escoteiro: #1b4d3e;
+            --verde-claro: #2c6b56;
+            --amarelo-alerta: #f39c12;
+            --cor-fundo: #f4f7f6;
+            --cor-card: #ffffff;
+            --texto-escuro: #2c3e50;
+            --texto-claro: #7f8c8d;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--cor-fundo); color: var(--texto-escuro); line-height: 1.6; }
+
+        header { background-color: var(--verde-escoteiro); color: white; padding: 1rem 2rem; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .nav-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: bold; cursor: pointer; }
+        .logo span { color: var(--amarelo-alerta); }
+        nav ul { display: flex; list-style: none; gap: 20px; align-items: center; }
+        nav a { color: white; text-decoration: none; font-weight: 500; transition: color 0.3s; }
+        nav a:hover, nav a.active { color: var(--amarelo-alerta); }
+
+        .btn-login-nav { background-color: var(--amarelo-alerta); color: white; padding: 0.5rem 1.2rem; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .btn-login-nav:hover { background-color: #e67e22; }
+
+        .flash-messages { max-width: 1200px; margin: 1rem auto; padding: 0 2rem; }
+        .alert { padding: 1rem; margin-bottom: 1rem; border-radius: 4px; font-weight: bold; }
+        .alert-success { background-color: #d4edda; color: #155724; }
+        .alert-danger { background-color: #f8d7da; color: #721c24; }
+        .alert-warning { background-color: #fff3cd; color: #856404; }
+        .alert-info { background-color: #d1ecf1; color: #0c5460; }
+
+        .hero { background: linear-gradient(rgba(27, 77, 62, 0.85), rgba(27, 77, 62, 0.95)), url('https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=1350&q=80') no-repeat center center/cover; color: white; padding: 4rem 2rem; text-align: center; }
+        .hero h1 { font-size: 2.5rem; margin-bottom: 1rem; }
+        .hero p { font-size: 1.2rem; margin-bottom: 2rem; opacity: 0.9; }
+        .btn { display: inline-block; background-color: var(--amarelo-alerta); color: white; padding: 0.8rem 1.8rem; border: none; border-radius: 5px; font-weight: bold; text-decoration: none; transition: background 0.3s, transform 0.2s; cursor: pointer;}
+        .btn:hover { background-color: #e67e22; transform: translateY(-2px); }
+
+        .main-container { max-width: 1200px; margin: 3rem auto; padding: 0 2rem; display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
+        @media (max-width: 768px) { .main-container { grid-template-columns: 1fr; } }
+
+        .feed-title { margin-bottom: 1.5rem; color: var(--verde-escoteiro); border-bottom: 2px solid var(--verde-claro); padding-bottom: 0.5rem; }
+        .card { background-color: var(--cor-card); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 5px solid var(--verde-claro); }
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.8rem; }
+        .grupo-nome { font-weight: bold; color: var(--verde-escoteiro); }
+        .tag { background-color: #e8f5e9; color: var(--verde-claro); padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.8rem; font-weight: bold; text-transform: uppercase; }
+        .card-meta { font-size: 0.85rem; color: var(--texto-claro); margin-bottom: 1rem; }
+        .btn-apoiar { background-color: transparent; border: 2px solid var(--verde-claro); color: var(--verde-claro); padding: 0.5rem 1rem; border-radius: 4px; font-weight: bold; cursor: pointer; transition: all 0.3s; text-decoration: none; display: inline-block;}
+        .btn-apoiar:hover { background-color: var(--verde-claro); color: white; }
+
+        .sidebar-form { background-color: var(--cor-card); padding: 1.5rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); height: fit-content; position: sticky; top: 90px; }
+        .sidebar-form h3 { color: var(--verde-escoteiro); margin-bottom: 1.2rem; }
+        .form-group { margin-bottom: 1.2rem; }
+        .form-group label { display: block; margin-bottom: 0.4rem; font-weight: 500; font-size: 0.9rem; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 0.6rem; border: 1px solid #ccc; border-radius: 4px; font-size: 0.95rem; }
+        .btn-submit { width: 100%; background-color: var(--verde-escoteiro); color: white; padding: 0.7rem; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .btn-submit:hover { background-color: var(--verde-claro); }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 2000; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal-box { background-color: var(--cor-card); width: 100%; max-width: 450px; padding: 2rem; border-radius: 8px; position: relative; display: none; max-height: 90vh; overflow-y: auto; }
+        .modal-box.active { display: block; }
+        .modal-box h3 { color: var(--verde-escoteiro); margin-bottom: 1.5rem; font-size: 1.5rem; border-bottom: 2px solid var(--amarelo-alerta); padding-bottom: 0.5rem; }
+        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer; color: var(--texto-claro); background: none; border: none; }
+        .switch-form-text { text-align: center; margin-top: 1.2rem; font-size: 0.9rem; color: var(--texto-claro); }
+        .switch-form-text a { color: var(--verde-claro); font-weight: bold; cursor: pointer; }
+
+        footer { background-color: var(--verde-escoteiro); color: white; text-align: center; padding: 1.5rem; margin-top: 4rem; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="nav-container">
+            <div class="logo" onclick="window.location.href='/'">⚜️ Rede <span>Sempre Alerta</span></div>
+            <nav>
+                <ul>
+                    <li><a href="/" class="active">Início</a></li>
+                    {% if session.get('usuario_id') %}
+                        <li><a href="/perfil">Minha Área</a></li>
+                        <li><a href="/logout" style="color: #ff7675;">Sair</a></li>
+                    {% else %}
+                        <li><a class="btn-login-nav" onclick="openModal('login')">Entrar</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-messages">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Fraternidade Escoteira em Ação</h1>
+            <p>Um espaço para Grupos Escoteiros compartilharem necessidades, doarem materiais e fortalecerem o movimento.</p>
+            <a href="#cadastro" class="btn">Cadastrar uma Necessidade</a>
+        </div>
+    </section>
+
+    <div class="main-container">
+        <main>
+            <h2 class="feed-title">Pedidos de Apoio Recentes</h2>
+
+            {% if necessidades %}
+                {% for necessidade in necessidades %}
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <span class="grupo-nome">{{ necessidade.grupo_escoteiro }}</span>
+                                <h3>{{ necessidade.titulo }}</h3>
+                            </div>
+                            <span class="tag">{{ necessidade.categoria }}</span>
+                        </div>
+                        <p>{{ necessidade.descricao }}</p>
+                        <div class="card-meta">Localidade: {{ necessidade.localidade }}</div>
+                        <a href="/apoiar/{{ necessidade.id }}" class="btn-apoiar">Quero Apoiar</a>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>Nenhum pedido ativo no momento. Seja o primeiro a cadastrar!</p>
+            {% endif %}
+        </main>
+
+        <aside class="sidebar-form" id="cadastro">
+            <h3>Cadastrar Pedido</h3>
+            <form action="/cadastrar_necessidade" method="POST">
+                <div class="form-group">
+                    <label for="grupo">Nome do Grupo Escoteiro</label>
+                    <input type="text" id="grupo" name="grupo" value="{{ session.get('grupo', '') }}" placeholder="Ex: 316º GE Sardarabad" required>
+                </div>
+                <div class="form-group">
+                    <label for="categoria">Categoria da Necessidade</label>
+                    <select id="categoria" name="categoria" required>
+                        <option value="">Selecione...</option>
+                        <option value="Equipamentos">Equipamentos</option>
+                        <option value="Materiais">Materiais Didáticos</option>
+                        <option value="Sede">Espaço / Sede</option>
+                        <option value="Transporte">Transporte</option>
+                        <option value="Outros">Outros</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="titulo">Título do Pedido</label>
+                    <input type="text" id="titulo" name="titulo" placeholder="Ex: Precisa-se de Cozinhas de Campanha" required>
+                </div>
+                <div class="form-group">
+                    <label for="descricao">Descrição Detalhada</label>
+                    <textarea id="descricao" name="descricao" rows="4" placeholder="Explique detalhadamente..." required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="localidade">Cidade / UF</label>
+                    <input type="text" id="localidade" name="localidade" placeholder="Ex: São Paulo - SP" required>
+                </div>
+                <button type="submit" class="btn-submit">Publicar na Rede</button>
+            </form>
+        </aside>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-box" id="loginBox">
+            <button class="close-modal" onclick="closeModal()">&times;</button>
+            <h3>Sempre Alerta!</h3>
+            <form action="/login" method="POST">
+                <div class="form-group">
+                    <label>Registro Escoteiro</label>
+                    <input type="text" name="loginRegistro" placeholder="Ex: 123456-7" required>
+                </div>
+                <div class="form-group">
+                    <label>Senha</label>
+                    <input type="password" name="loginSenha" placeholder="Digite sua senha" required>
+                </div>
+                <button type="submit" class="btn-submit">Entrar</button>
+                <p class="switch-form-text">Não tem conta? <a onclick="switchForm('register')">Cadastre-se aqui</a></p>
+            </form>
+        </div>
+
+        <div class="modal-box" id="registerBox">
+            <button class="close-modal" onclick="closeModal()">&times;</button>
+            <h3>Criar Conta Escoteira</h3>
+            <form action="/cadastro_usuario" method="POST">
+                <div class="form-group">
+                    <label>Registro Escoteiro</label>
+                    <input type="text" name="regRegistro" placeholder="Ex: 123456-7" required>
+                </div>
+                <div class="form-group">
+                    <label>Nome Completo</label>
+                    <input type="text" name="regNome" placeholder="Seu nome completo" required>
+                </div>
+                <div class="form-group">
+                    <label>Grupo Escoteiro</label>
+                    <input type="text" name="regGrupo" placeholder="Ex: 316º GE Sardarabad" required>
+                </div>
+                <div class="form-group">
+                    <label>E-mail institucional</label>
+                    <input type="email" name="regEmail" placeholder="seu-email@provedor.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Telefone Celular (WhatsApp)</label>
+                    <input type="tel" name="regTelefone" placeholder="Ex: (11) 99999-9999" required>
+                </div>
+                <div class="form-group">
+                    <label>Rede Social (Instagram/Facebook - Opcional)</label>
+                    <input type="text" name="regRedeSocial" placeholder="Ex: @grupoescoteiro">
+                </div>
+                <div class="form-group">
+                    <label>Site do Grupo (Opcional)</label>
+                    <input type="url" name="regSite" placeholder="Ex: https://meugrupo.com.br">
+                </div>
+                <div class="form-group">
+                    <label>Senha</label>
+                    <input type="password" name="regSenha" placeholder="Crie uma senha" required>
+                </div>
+                <button type="submit" class="btn-submit">Cadastrar Conta</button>
+                <p class="switch-form-text">Já possui conta? <a onclick="switchForm('login')">Fazer Login</a></p>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2026 Rede Sempre Alerta - Desenvolvido para a Fraternidade Escoteira.</p>
+    </footer>
+
+    <script>
+        const overlay = document.getElementById('modalOverlay');
+        const loginBox = document.getElementById('loginBox');
+        const registerBox = document.getElementById('registerBox');
+
+        function openModal(type) {
+            overlay.classList.add('active');
+            if (type === 'login') { 
+                loginBox.classList.add('active'); 
+                registerBox.classList.remove('active'); 
+            } else { 
+                registerBox.classList.add('active'); 
+                loginBox.classList.remove('active'); 
+            }
+        }
+        function closeModal() { 
+            overlay.classList.remove('active'); 
+            loginBox.classList.remove('active'); 
+            registerBox.classList.remove('active'); 
+        }
+        function switchForm(type) { 
+            if (type === 'register') { 
+                loginBox.classList.remove('active'); 
+                registerBox.classList.add('active'); 
+            } else { 
+                registerBox.classList.remove('active'); 
+                loginBox.classList.add('active'); 
+            } 
+        }
+        overlay.addEventListener('click', function(e) { if (e.target === overlay) closeModal(); });
+    </script>
+</body>
+</html>

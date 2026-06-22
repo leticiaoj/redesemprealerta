@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minha Área - Rede Sempre Alerta</title>
+    <style>
+        :root {
+            --verde-escoteiro: #1b4d3e;
+            --verde-claro: #2c6b56;
+            --amarelo-alerta: #f39c12;
+            --cor-fundo: #f4f7f6;
+            --cor-card: #ffffff;
+            --texto-escuro: #2c3e50;
+            --texto-claro: #7f8c8d;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--cor-fundo); color: var(--texto-escuro); line-height: 1.6; }
+
+        header { background-color: var(--verde-escoteiro); color: white; padding: 1rem 2rem; }
+        .nav-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: bold; cursor: pointer; }
+        .logo span { color: var(--amarelo-alerta); }
+        nav ul { display: flex; list-style: none; gap: 20px; align-items: center; }
+        nav a { color: white; text-decoration: none; font-weight: 500; }
+        nav a:hover, nav a.active { color: var(--amarelo-alerta); }
+
+        .flash-messages { max-width: 1200px; margin: 1rem auto; padding: 0 2rem; }
+        .alert { padding: 1rem; margin-bottom: 1rem; border-radius: 4px; font-weight: bold; }
+        .alert-success { background-color: #d4edda; color: #155724; }
+
+        .dashboard-container { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; display: grid; grid-template-columns: 1fr 2fr; gap: 30px; }
+        @media (max-width: 768px) { .dashboard-container { grid-template-columns: 1fr; } }
+
+        .profile-card { background-color: var(--cor-card); padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); height: fit-content; }
+        .profile-header { text-align: center; margin-bottom: 1.5rem; }
+        .profile-avatar { width: 80px; height: 80px; background-color: var(--verde-escoteiro); color: white; font-size: 2.5rem; display: flex; align-items: center; justify-content: center; border-radius: 50%; margin: 0 auto 1rem auto; }
+        .profile-header h3 { color: var(--verde-escoteiro); }
+        .profile-header p { color: var(--texto-claro); font-size: 0.9rem; }
+
+        .form-group { margin-bottom: 1.2rem; }
+        .form-group label { display: block; margin-bottom: 0.4rem; font-weight: 500; font-size: 0.9rem; }
+        .form-group input { width: 100%; padding: 0.6rem; border: 1px solid #ccc; border-radius: 4px; font-size: 0.95rem; }
+        .btn-submit { width: 100%; background-color: var(--verde-escoteiro); color: white; padding: 0.7rem; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .btn-submit:hover { background-color: var(--verde-claro); }
+
+        .activity-section { display: flex; flex-direction: column; gap: 30px; }
+        .activity-block { background-color: var(--cor-card); padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .activity-block h3 { color: var(--verde-escoteiro); border-bottom: 2px solid var(--amarelo-alerta); padding-bottom: 0.5rem; margin-bottom: 1.5rem; }
+
+        .data-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+        .data-table th, .data-table td { padding: 0.8rem; text-align: left; border-bottom: 1px solid #ddd; vertical-align: top; }
+        .data-table th { background-color: #f8f9fa; color: var(--verde-escoteiro); }
+        
+        .status-badge { display: inline-block; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem; font-weight: bold; background-color: #e8f5e9; color: var(--verde-claro); }
+        .status-badge.encerrado { background-color: #ffeaa7; color: #b7791f; }
+        
+        .btn-acao { display: inline-block; padding: 0.3rem 0.6rem; font-size: 0.8rem; font-weight: bold; text-decoration: none; border-radius: 4px; margin-right: 5px; cursor: pointer; }
+        .btn-status-encerrar { background-color: #ffeaa7; color: #d63031; border: 1px solid #ffeaa7; }
+        .btn-status-ativar { background-color: #55efc4; color: #00b894; border: 1px solid #55efc4; }
+        .btn-deletar { background-color: #ff7675; color: white; border: 1px solid #ff7675; }
+        .btn-acao:hover { opacity: 0.8; }
+
+        .contato-lista { list-style: none; padding: 0; font-size: 0.85rem; }
+        .contato-lista li { margin-bottom: 0.2rem; }
+
+        footer { background-color: var(--verde-escoteiro); color: white; text-align: center; padding: 1.5rem; margin-top: 4rem; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="nav-container">
+            <div class="logo" onclick="window.location.href='/'">⚜️ Rede <span>Sempre Alerta</span></div>
+            <nav>
+                <ul>
+                    <li><a href="/">Início</a></li>
+                    <li><a href="/perfil" class="active">Minha Área</a></li>
+                    <li><a href="/logout" style="color: #ff7675;">Sair</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-messages">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <div class="dashboard-container">
+        <aside class="profile-card">
+            <div class="profile-header">
+                <div class="profile-avatar">⚜️</div>
+                <h3>{{ session.get('nome') }}</h3>
+                <p>{{ session.get('grupo') }}</p>
+            </div>
+
+            <form action="/perfil" method="POST">
+                <h4 style="color: var(--verde-claro); margin-bottom: 1rem; border-bottom: 1px solid #ddd; padding-bottom: 0.3rem;">Alterar Informações</h4>
+                <div class="form-group">
+                    <label>Nome Completo</label>
+                    <input type="text" name="editNome" value="{{ session.get('nome') }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Registro Escoteiro</label>
+                    <input type="text" name="editRegistro" value="{{ session.get('registro') }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Grupo Escoteiro</label>
+                    <input type="text" name="editGrupo" value="{{ session.get('grupo') }}" required>
+                </div>
+                <div class="form-group">
+                    <label>E-mail</label>
+                    <input type="email" name="editEmail" value="{{ session.get('email') }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Telefone Celular</label>
+                    <input type="tel" name="editTelefone" value="{{ session.get('telefone') }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Rede Social (Opcional)</label>
+                    <input type="text" name="editRedeSocial" value="{{ session.get('rede_social', '') }}">
+                </div>
+                <div class="form-group">
+                    <label>Site (Opcional)</label>
+                    <input type="url" name="editSite" value="{{ session.get('site', '') }}">
+                </div>
+                <div class="form-group">
+                    <label>Nova Senha (deixe em branco para manter)</label>
+                    <input type="password" name="editSenha" placeholder="********">
+                </div>
+                <button type="submit" class="btn-submit">Salvar Alterações</button>
+            </form>
+        </aside>
+
+        <main class="activity-section">
+            <div class="activity-block">
+                <h3>Pedidos que eu Cadastrei</h3>
+                <div style="overflow-x: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Título do Pedido</th>
+                                <th>Categoria</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for necessidade in minhas_necessidades %}
+                            <tr>
+                                <td><strong>{{ necessidade.titulo }}</strong></td>
+                                <td>{{ necessidade.categoria }}</td>
+                                <td>
+                                    {% if necessidade.status == 'Ativo' %}
+                                        <span class="status-badge">{{ necessidade.status }}</span>
+                                    {% else %}
+                                        <span class="status-badge encerrado">{{ necessidade.status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if necessidade.status == 'Ativo' %}
+                                        <a href="/alterar_status/{{ necessidade.id }}/Encerrado" class="btn-acao btn-status-encerrar">Encerrar</a>
+                                    {% else %}
+                                        <a href="/alterar_status/{{ necessidade.id }}/Ativo" class="btn-acao btn-status-ativar">Ativar</a>
+                                    {% endif %}
+                                    <a href="/excluir_necessidade/{{ necessidade.id }}" 
+                                       class="btn-acao btn-deletar" 
+                                       onclick="return confirm('Tem certeza que deseja excluir permanentemente este pedido?')">Excluir</a>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="4">Você ainda não cadastrou nenhuma necessidade.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="activity-block">
+                <h3>Pedidos que eu Apoiei</h3>
+                <div style="overflow-x: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Grupo Beneficiado</th>
+                                <th>Necessidade</th>
+                                <th>Formas de Contato</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for apoio in meus_apoios %}
+                            <tr>
+                                <td><strong>{{ apoio.grupo_escoteiro }}</strong></td>
+                                <td>{{ apoio.titulo }}</td>
+                                <td>
+                                    <ul class="contato-lista">
+                                        <li>📧 <strong>E-mail:</strong> {{ apoio.email }}</li>
+                                        <li>📱 <strong>Tel/Whats:</strong> {{ apoio.telefone }}</li>
+                                        {% if apoio.rede_social %}
+                                            <li>📱 <strong>Rede Social:</strong> {{ apoio.rede_social }}</li>
+                                        {% endif %}
+                                        {% if apoio.site %}
+                                            <li>🌐 <strong>Site:</strong> <a href="{{ apoio.site }}" target="_blank">Visitar site</a></li>
+                                        {% endif %}
+                                    </ul>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="3">Você ainda não se ofereceu para apoiar nenhum pedido.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer>
+        <p>© 2026 Rede Sempre Alerta - Sempre Alerta para Servir!</p>
+    </footer>
+</body>
+</html>

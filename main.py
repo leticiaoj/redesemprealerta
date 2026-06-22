@@ -1,20 +1,23 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from werkzeug.security import generate_password_hash, check_password_hash
 import pymysql
+import os
 
 app = Flask(__name__)
-app.secret_key = 'chave_secreta_para_sessoes_escoteiras'
+
+# Configura a chave secreta usando variáveis de ambiente (essencial para a nuvem)
+app.secret_key = os.environ.get('SECRET_KEY', 'chave_secreta_para_sessoes_escoteiras')
 
 # =========================================================================
-# 🔴 CONEXÃO COM O BANCO DE DADOS MYSQL
+# 🔴 CONEXÃO COM O BANCO DE DADOS (Configurada para Local e Nuvem)
 # =========================================================================
 def get_db_connection():
     return pymysql.connect(
-        host='localhost',
-        port=3306,
-        user='root',
-        password='root',
-        database='rede_sempre_alerta',
+        host=os.environ.get('DB_HOST', 'localhost'),
+        port=int(os.environ.get('DB_PORT', 3306)),
+        user=os.environ.get('DB_USER', 'root'),
+        password=os.environ.get('DB_PASSWORD', 'root'),
+        database=os.environ.get('DB_NAME', 'rede_sempre_alerta'),
         cursorclass=pymysql.cursors.DictCursor
     )
 # =========================================================================
@@ -124,9 +127,8 @@ def apoiar(necessidade_id):
     conn = get_db_connection()
     try:
         with conn.cursor() as cursor:
-            sql = "INSERT INTO apoios (usuario_id, 필요_id) VALUES (%s, %s)"
-            # Correção mantida aqui:
             sql = "INSERT INTO apoios (usuario_id, necessidade_id) VALUES (%s, %s)"
+            cursor.execute(sql, (session['usuario_id'], necesidad_id))
             cursor.execute(sql, (session['usuario_id'], necessidade_id))
         conn.commit()
         flash('Obrigado! Você se prontificou a apoiar este pedido. Verifique os contatos na Minha Área.', 'success')
@@ -231,4 +233,5 @@ def excluir_necessidade(necessidade_id):
     return redirect(url_for('perfil'))
 
 if __name__ == '__main__':
+    # Em produção (Render), o servidor usa o gunicorn. Localmente, roda em modo debug.
     app.run(debug=True)
